@@ -1,7 +1,7 @@
 ﻿var input = File.ReadAllText("input.txt");
 
 // Part 1
-var calories = input.Split("\n\n").Select(g => g.Split("\n", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).Sum());
+var calories = input.Split("\n\n").Select(g => g.Split("\n").Select(int.Parse).Sum());
 Console.WriteLine(calories.Max());
 
 // Part 2
