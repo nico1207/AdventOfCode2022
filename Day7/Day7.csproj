@@ -16,4 +16,8 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MedallionComparers" Version="1.0.0" />
+    </ItemGroup>
+
 </Project>
