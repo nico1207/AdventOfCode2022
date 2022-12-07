@@ -1,5 +1,5 @@
-﻿Dictionary<string, long> sizes = new Dictionary<string, long>();
-string currentPath = "";
+var sizes = new Dictionary<string, long>();
+var currentPath = "";
 
 foreach (var line in File.ReadAllLines("input.txt").Select(l => l.Split(" ")))
 {
