@@ -1,31 +1,15 @@
-var sizes = new Dictionary<string, long>();
-var currentPath = "";
+using System.Collections.Immutable;
 
-foreach (var line in File.ReadAllLines("input.txt").Select(l => l.Split(" ")))
+var data = File.ReadAllLines("input.txt").Aggregate((dict: ImmutableDictionary<string, long>.Empty.SetItem("/", 0), curDir: "/"), (i, s) => s.Split(" ") switch
 {
-    switch (line)
-    {
-        case ["dir", _]:
-        case ["$", "ls"]:
-            break;
-        case ["$", "cd", var path]:
-            currentPath = Path.GetFullPath(Path.Combine(currentPath, path));
-            sizes.TryAdd(currentPath, 0);
-            break;
-        case [var size, _]:
-            string directory = currentPath;
-            while (directory != @"C:\")
-            {
-                sizes[directory] += long.Parse(size);
-                directory = Path.GetFullPath(Path.Combine(directory, ".."));
-            }
-            sizes[directory] += long.Parse(size); // Add to root
-            break;
-    }
-}
+    ["dir", _] or ["$", "ls"] or ["$", "cd", "/"] => i,
+    ["$", "cd", ".."] => (i.dict, i.curDir[..i.curDir[..^1].LastIndexOf("/")] + "/"),
+    ["$", "cd", var path] => (i.dict.SetItem(i.curDir + path + "/", 0), i.curDir + path + "/"),
+    [var size, _] => (i.dict.SetItems(Enumerable.Range(0, i.curDir.Count(c => c == '/')+1).Select(j => string.Join('/', i.curDir.Split('/').Take(j)) + "/").Select(k => new KeyValuePair<string, long>(k, i.dict[k] + long.Parse(size)))), i.curDir)
+});
 
-Console.WriteLine(sizes.Where(s => s.Value <= 100000).Sum(s => s.Value));
+Console.WriteLine(data.dict.Where(s => s.Value <= 100000).Sum(s => s.Value));
 
-var spaceNeeded = 30000000 - (70000000 - sizes[@"C:\"]);
-var firstFile = sizes.Where(s => s.Value > spaceNeeded).MinBy(s => s.Value);
+var spaceNeeded = 30000000 - (70000000 - data.dict["/"]);
+var firstFile = data.dict.Where(s => s.Value > spaceNeeded).MinBy(s => s.Value);
 Console.WriteLine(firstFile.Value);
