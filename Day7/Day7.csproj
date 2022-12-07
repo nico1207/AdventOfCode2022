@@ -18,6 +18,7 @@
 
     <ItemGroup>
       <PackageReference Include="MedallionComparers" Version="1.0.0" />
+      <PackageReference Include="morelinq" Version="3.3.2" />
     </ItemGroup>
 
 </Project>
