@@ -1,28 +1,6 @@
-﻿List<object> ParsePacket(string line)
-{
-    Stack<List<object>> lists = new Stack<List<object>>();
-    for (var i = 0; i < line.Length; i++)
-        switch (line[i])
-        {
-            case '[':
-                lists.Push(new List<object>());
-                break;
-            case ']':
-                var list = lists.Pop();
-                if (lists.Count == 0)
-                    return list;
-                lists.Peek().Add(list);
-                break;
-            case char c when char.IsDigit(c):
-                string number = "" + c;
-                while (char.IsDigit(line[i + 1]))
-                    number += line[++i];
-                lists.Peek().Add(int.Parse(number));
-                break;
-        }
+﻿using System.Text.Json;
 
-    throw new ArgumentException("Invalid packet");
-}
+List<object> ParsePacket(string line) => JsonSerializer.Deserialize<JsonElement>(line).EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Number ? (object)x.GetInt32() : ParsePacket(x.GetRawText())).ToList();
 
 ComparisonResult Compare(object left, object right)
 {
