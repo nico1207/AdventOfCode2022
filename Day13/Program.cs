@@ -78,12 +78,11 @@ ComparisonResult Compare(object left, object right)
 }
 
 // Part 1
-var input = File.ReadAllLines("input.txt").Where(l => !string.IsNullOrWhiteSpace(l)).Chunk(2).Select(c => (left: c.First(), right: c.Last()));
-var parsedInput = input.Select(c => (left: ParsePacket(c.left), right: ParsePacket(c.right)));
-Console.WriteLine(parsedInput.Select((pair, index) => (pair, index: index+1)).Where(t => Compare(t.pair.left, t.pair.right) == ComparisonResult.RightOrder).Sum(t => t.index));
+var input = File.ReadAllLines("input.txt").Select(ParsePacket).Chunk(2).Select(c => (left: c.First(), right: c.Last()));
+Console.WriteLine(input.Select((pair, index) => (pair, index: index+1)).Where(t => Compare(t.pair.left, t.pair.right) == ComparisonResult.RightOrder).Sum(t => t.index));
 
 // Part 2
-var allPackets = File.ReadAllLines("input.txt").Where(l => !string.IsNullOrWhiteSpace(l)).Select(ParsePacket).ToList();
+var allPackets = File.ReadAllLines("input.txt").Select(ParsePacket).ToList();
 var dividerA = new List<object> { new List<object> { 2 } };
 var dividerB = new List<object> { new List<object> { 6 } };
 allPackets.Add(dividerA);
