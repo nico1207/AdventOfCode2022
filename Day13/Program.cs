@@ -2,79 +2,49 @@
 {
     Stack<List<object>> lists = new Stack<List<object>>();
     for (var i = 0; i < line.Length; i++)
-    {
-        var c = line[i];
-        
-        switch (c)
+        switch (line[i])
         {
             case '[':
                 lists.Push(new List<object>());
                 break;
             case ']':
-            {
                 var list = lists.Pop();
                 if (lists.Count == 0)
-                {
                     return list;
-                }
                 lists.Peek().Add(list);
                 break;
-            }
-            case char when char.IsDigit(c):
-            {
+            case char c when char.IsDigit(c):
                 string number = "" + c;
                 while (char.IsDigit(line[i + 1]))
-                {
-                    i++;
-                    number += line[i];
-                }
+                    number += line[++i];
                 lists.Peek().Add(int.Parse(number));
                 break;
-            }
         }
-    }
 
-    return null;
+    throw new ArgumentException("Invalid packet");
 }
 
 ComparisonResult Compare(object left, object right)
 {
+    switch (left)
     {
-        if (left is int leftInt && right is int rightInt)
-        {
+        case int leftInt when right is int rightInt:
             if (leftInt < rightInt) return ComparisonResult.RightOrder;
             if (leftInt > rightInt) return ComparisonResult.WrongOrder;
             return ComparisonResult.CheckNext;
-        }
-    }
-    {
-        if (left is List<object> leftList && right is int rightInt)
-        {
-            return Compare(leftList, new List<object> { rightInt });
-        }
-    }
-    {
-        if (left is int leftInt && right is List<object> rightList)
-        {
+        case int leftInt when right is List<object> rightList:
             return Compare(new List<object> { leftInt }, rightList);
-        }
-    }
-    {
-        if (left is List<object> leftList && right is List<object> rightList)
-        {
+        case List<object> leftList when right is int rightInt:
+            return Compare(leftList, new List<object> { rightInt });
+        case List<object> leftList when right is List<object> rightList:
             if (leftList.Count == 0 && rightList.Count == 0) return ComparisonResult.CheckNext;
             if (leftList.Count == 0) return ComparisonResult.RightOrder;
             if (rightList.Count == 0) return ComparisonResult.WrongOrder;
             var result = Compare(leftList[0], rightList[0]);
-            if (result == ComparisonResult.CheckNext)
-            {
-                return Compare(leftList.Skip(1).ToList(), rightList.Skip(1).ToList());
-            }
-            return result;
-        }
+            return result == ComparisonResult.CheckNext ? Compare(leftList.Skip(1).ToList(), rightList.Skip(1).ToList()) : result;
+        default:
+            throw new Exception("Unknown types");
     }
-    
-    throw new Exception("Unknown types");
 }
 
 // Part 1
