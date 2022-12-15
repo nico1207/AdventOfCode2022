@@ -1,4 +1,6 @@
-﻿public class Part1 {
+﻿using System.Diagnostics;
+
+public class Part1 {
     public static void Run1() {
         var paths = File.ReadAllLines("input.txt").Select(l => l.Split(" -> ").Select(l => l.Split(",").Select(int.Parse).ToArray()).Select(a => (x: a[0], y:a[1])).ToArray());
         var sparseMap = new Dictionary<(int x, int y), MapTile>();
@@ -65,8 +67,15 @@
 
     public static void Main()
     {
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
         Part1.Run1();
+        sw.Stop();
+        Console.WriteLine(sw.Elapsed.TotalMilliseconds);
+        sw.Restart();
         Part2.Run2();
+        sw.Stop();
+        Console.WriteLine(sw.Elapsed.TotalMilliseconds);
     }
     
     enum MapTile
